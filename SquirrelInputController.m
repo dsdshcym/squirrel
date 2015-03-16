@@ -33,7 +33,7 @@
 //  NSLog(@"handleEvent:client:");
 
   _currentClient = sender;
-  
+
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
   if (!_session || !RimeFindSession(_session)) {
@@ -43,11 +43,11 @@
       return NO;
     }
   }
-  
+
   NSString *app = [_currentClient bundleIdentifier];
 //  NSLog(@"app = %@", app);
 //  NSLog(@"_currentApp = %@", _currentApp);
-  
+
   if (![_currentApp isEqualToString:app]) {
     _currentApp = [app copy];
     [self updateAppOptions];
@@ -156,12 +156,13 @@
 
   if (!handled) {
     BOOL isVimBackInCommandMode = rime_keycode == XK_Escape ||
-    ((rime_modifiers & kControlMask) && (rime_keycode == XK_c ||
-                                         rime_keycode == XK_C ||
-                                         rime_keycode == XK_bracketleft));
+    ((rime_modifiers & kControlMask) && (rime_keycode == XK_bracketleft));
     if (isVimBackInCommandMode) {
       NSString* app = [_currentClient bundleIdentifier];
-      if ([app isEqualToString:@"org.vim.MacVim"] && !RimeGetOption(_session, "ascii_mode")) {
+      if (([app isEqualToString:@"org.vim.MacVim"] ||
+           [app isEqualToString:@"com.googlecode.iterm2"] ||
+           [app isEqualToString:@"org.gnu.Emacs"]) &&
+          !RimeGetOption(_session, "ascii_mode")) {
         RimeSetOption(_session, "ascii_mode", True);
         NSLog(@"disable conversion to Chinese in MacVim's command mode");
       }
@@ -421,7 +422,7 @@
   NSLog(@"createSession: %@", app);
   _currentApp = [app copy];
   _session = RimeCreateSession();
-  
+
   [_schemaId release];
   _schemaId = nil;
 
